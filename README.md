@@ -6,3 +6,5 @@ automata using Wolfram Numbers.
 ## example
 
 	$ ./totalistic_2d 462
+
+![totalistic CA 462](https://github.com/williamholland/totalistic_2dca/blob/master/Figure_1.png)
