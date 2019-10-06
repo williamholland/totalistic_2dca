@@ -58,19 +58,19 @@ def generate(rule_b, size=100, steps=100, random_init=True):
 
     # Apply the step function iteratively.
     step = get_step(rule_b)
-    for i in range(steps - 1):
+    for i in range(steps):
         grid = step(grid)
         yield grid
 
 
-def main(rule):
+def main(rule, size, steps, random_init):
 
     # binary representation of the rule.
     rule_b = np.array( [int(i) for i in np.binary_repr(rule, 10)],
                        dtype=np.int8
     )
 
-    generator = generate(rule_b, size=100, steps=23, random_init=False)
+    generator = generate(rule_b, size, steps, random_init)
     for x in generator:
         pass
 
@@ -85,7 +85,10 @@ def main(rule):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Plot a 2D totalistic CA from a Wolfram Number')
+    parser.add_argument('--steps', type=int, default=22, help='How many steps of the cellular automaton to do before plotting')
+    parser.add_argument('--size', type=int, default=45, help='size of the square grid to plot on')
+    parser.add_argument('--random_init', action='store_true')
     parser.add_argument('rule', type=int, help='Wolfram Number to plot')
     args = parser.parse_args()
 
-    main(args.rule)
+    main(args.rule, args.size, args.steps, args.random_init)
