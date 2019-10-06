@@ -6,6 +6,18 @@ import scipy.ndimage as ndimage
 import argparse
 
 
+FOOTPRINTS = {
+    'neumann': np.array([[0,1,0],
+                         [1,0,1],
+                         [0,1,0]]),
+    'moore':   np.array([[1,1,1],
+                         [1,0,1],
+                         [1,1,1]]),
+}
+
+
+
+
 def compute_cell(rule_b):
     ''' compute the new value of a cell given
     
@@ -19,16 +31,14 @@ def compute_cell(rule_b):
     return partial
 
 
-def get_step(rule_b):
+def get_step(rule_b, neighbourhood):
     """ returns a function that will iterate the grid for a given rule """
 
     def partial(grid):
         """ iterate the whole grid"""
 
         # von neumann neighbourhood with radius 1
-        footprint = np.array([[0,1,0],
-                              [1,0,1],
-                              [0,1,0]])
+        footprint = FOOTPRINTS[neighbourhood]
 
         # make array 3D with 3rd dimension being the value and then the
         # number of neighbours of each cell
@@ -42,7 +52,7 @@ def get_step(rule_b):
     return partial
 
 
-def generate(rule_b, size=100, steps=100, random_init=True):
+def generate(rule_b, size=100, steps=100, random_init=True, neighbourhood='neumann'):
     """ Simulate an totalistic 2D cellular automaton given a rule number
     
         random_init: if True, fill the grid randomly with 1s and 0s, if False
@@ -57,20 +67,21 @@ def generate(rule_b, size=100, steps=100, random_init=True):
         grid[size//2, size//2] = 1
 
     # Apply the step function iteratively.
-    step = get_step(rule_b)
+    step = get_step(rule_b, neighbourhood)
     for i in range(steps):
         grid = step(grid)
         yield grid
 
 
-def main(rule, size, steps, random_init):
+def main(rule, size, steps, random_init, neighbourhood):
 
     # binary representation of the rule.
-    rule_b = np.array( [int(i) for i in np.binary_repr(rule, 10)],
+    bits = 10 if neighbourhood == 'neumann' else 18
+    rule_b = np.array( [int(i) for i in np.binary_repr(rule, bits)],
                        dtype=np.int8
     )
 
-    generator = generate(rule_b, size, steps, random_init)
+    generator = generate(rule_b, size, steps, random_init, neighbourhood)
     for x in generator:
         pass
 
@@ -87,8 +98,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot a 2D outer-totalistic CA from a Wolfram Number')
     parser.add_argument('--steps', type=int, default=22, help='How many steps of the cellular automaton to do before plotting')
     parser.add_argument('--size', type=int, default=45, help='size of the square grid to plot on')
+    parser.add_argument('--neighbourhood', '-n', type=str, default='neumann', help='which neighbourhood to use ("neumann" or "moore")')
     parser.add_argument('--random_init', action='store_true')
     parser.add_argument('rule', type=int, help='Wolfram Number to plot')
     args = parser.parse_args()
 
-    main(args.rule, args.size, args.steps, args.random_init)
+    main(args.rule, args.size, args.steps, args.random_init, args.neighbourhood)
