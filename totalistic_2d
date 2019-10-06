@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.ndimage as ndimage
+import argparse
+
+
+def compute_cell(rule_b):
+    ''' compute the new value of a cell given
+    
+        rule_b: binary representation of the rule as a list
+        old_val: previous value of the cell (0 or 1)
+        num_neighbours: an int of the number of nonzero neighbours the cell has
+    '''
+    l = list(reversed(rule_b))
+    def partial(old_val, num_neighbours):
+        return l[(2 * num_neighbours) + old_val]
+    return partial
+
+
+def get_step(rule_b):
+    """ returns a function that will iterate the grid for a given rule """
+
+    def partial(grid):
+        """ iterate the whole grid"""
+
+        # von neumann neighbourhood with radius 1
+        footprint = np.array([[0,1,0],
+                              [1,0,1],
+                              [0,1,0]])
+
+        # make array 3D with 3rd dimension being the value and then the
+        # number of neighbours of each cell
+        neighbours_grid = np.dstack((grid, ndimage.generic_filter(grid, lambda x: x.sum()
+    , footprint=footprint)))
+
+        f = compute_cell(rule_b)
+        result = np.array([[ f(neighbours_grid[j][i][0], neighbours_grid[j][i][1]) for i in range(grid.shape[0])] for j in range(grid.shape[1])])
+
+        return result
+    return partial
+
+
+def generate(rule_b, size=100, steps=100, random_init=True):
+    """ Simulate an totalistic 2D cellular automaton given a rule number
+    
+        random_init: if True, fill the grid randomly with 1s and 0s, if False
+        then it inits a grid of zeros and the middle cell will be 1
+    """
+
+    # initial state.
+    grid = np.zeros((size, size), dtype=np.int8)
+    if random_init:
+        grid = np.random.rand(size, size) < .5
+    else:
+        grid[size//2, size//2] = 1
+
+    # Apply the step function iteratively.
+    step = get_step(rule_b)
+    for i in range(steps - 1):
+        grid = step(grid)
+        yield grid
+
+
+def main(rule):
+
+    # binary representation of the rule.
+    rule_b = np.array( [int(i) for i in np.binary_repr(rule, 10)],
+                       dtype=np.int8
+    )
+
+    generator = generate(rule_b, size=100, steps=23, random_init=False)
+    for x in generator:
+        pass
+
+    fig, ax = plt.subplots()
+    ax.imshow(x, interpolation='none',
+              cmap=plt.cm.binary)
+    ax.set_axis_off()
+
+    plt.show()
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Plot a 2D totalistic CA from a Wolfram Number')
+    parser.add_argument('rule', type=int, help='Wolfram Number to plot')
+    args = parser.parse_args()
+
+    main(args.rule)
