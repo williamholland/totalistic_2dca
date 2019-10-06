@@ -10,6 +10,6 @@ These are the automata considered on page 173 of Wolfram's A New Kind of Science
 
 ## example
 
-	$ ./totalistic_2d 462
+	$ ./ot2dca 462
 
 ![totalistic CA 462](https://github.com/williamholland/totalistic_2dca/blob/master/Figure_1.png)

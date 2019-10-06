@@ -84,7 +84,7 @@ def main(rule, size, steps, random_init):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Plot a 2D totalistic CA from a Wolfram Number')
+    parser = argparse.ArgumentParser(description='Plot a 2D outer-totalistic CA from a Wolfram Number')
     parser.add_argument('--steps', type=int, default=22, help='How many steps of the cellular automaton to do before plotting')
     parser.add_argument('--size', type=int, default=45, help='size of the square grid to plot on')
     parser.add_argument('--random_init', action='store_true')
