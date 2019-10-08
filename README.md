@@ -8,6 +8,8 @@ neighbourhoods](https://en.wikipedia.org/wiki/Von_Neumann_neighborhood) using
 
 These are the automata considered on page 173 of Wolfram's A New Kind of Science.
 
+Find an explanation of the codes [on my blog](https://imaginarypart284141230.wordpress.com/2019/10/07/2-dimensional-cellular-automata-wolfram-codes/).
+
 ## example
 
 	$ ./ot2dca 462
